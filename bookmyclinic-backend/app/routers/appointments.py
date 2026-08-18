@@ -9,6 +9,7 @@ from app.core.dependencies import get_current_user
 from app.database import get_db
 from app.models.appointment import Appointment
 from app.models.appointment_slot import AppointmentSlot
+from app.models.doctor import Doctor
 from app.models.user import User
 from app.schemas.appointment import AppointmentCreate, AppointmentOut, SlotOut
 from app.services.booking import BookingError, book_slot, cancel_appointment, reschedule_appointment
@@ -19,7 +20,7 @@ router = APIRouter()
 async def get_appointment_or_404(db: AsyncSession, appointment_id: int) -> Appointment:
     appointment = await db.scalar(
         select(Appointment)
-        .options(selectinload(Appointment.slot))
+        .options(selectinload(Appointment.slot).selectinload(AppointmentSlot.doctor).selectinload(Doctor.clinic))
         .where(Appointment.id == appointment_id)
     )
     if appointment is None:
@@ -69,7 +70,7 @@ async def appointment_history(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
     result = await db.scalars(
         select(Appointment)
-        .options(selectinload(Appointment.slot))
+        .options(selectinload(Appointment.slot).selectinload(AppointmentSlot.doctor).selectinload(Doctor.clinic))
         .where(Appointment.user_id == user_id)
         .order_by(Appointment.created_at.desc())
     )

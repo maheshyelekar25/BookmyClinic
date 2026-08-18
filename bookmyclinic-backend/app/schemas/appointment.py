@@ -14,6 +14,30 @@ class SlotOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AppointmentClinicOut(BaseModel):
+    id: int
+    name: str
+    address: str
+    city: str
+    state: str
+    pincode: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AppointmentDoctorOut(BaseModel):
+    id: int
+    name: str
+    specialization: str
+    clinic: AppointmentClinicOut
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AppointmentSlotOut(SlotOut):
+    doctor: AppointmentDoctorOut
+
+
 class AppointmentCreate(BaseModel):
     slot_id: int = Field(gt=0)
 
@@ -24,6 +48,6 @@ class AppointmentOut(BaseModel):
     slot_id: int
     status: str
     created_at: datetime
-    slot: SlotOut
+    slot: AppointmentSlotOut
 
     model_config = ConfigDict(from_attributes=True)

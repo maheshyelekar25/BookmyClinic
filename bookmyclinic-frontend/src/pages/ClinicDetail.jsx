@@ -34,7 +34,7 @@ export default function ClinicDetail() {
               <article key={doctor.id} className="rounded-lg border border-slate-200 p-4">
                 <h3 className="font-semibold">{doctor.name}</h3>
                 <p className="mt-1 text-sm text-slate-600">{doctor.specialization} · {doctor.experience_years} years experience</p>
-                <Link to={`/doctors/${doctor.id}/slots`} className="mt-3 inline-block rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700">Book Appointment</Link>
+                <Link to={`/doctors/${doctor.id}/slots`} state={{ clinic, doctor }} className="mt-3 inline-block rounded-md bg-sky-600 px-3 py-2 text-sm font-semibold text-white hover:bg-sky-700">Book Appointment</Link>
               </article>
             ))}
           </div>

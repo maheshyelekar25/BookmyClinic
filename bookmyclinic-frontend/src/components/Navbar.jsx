@@ -20,6 +20,7 @@ export default function Navbar() {
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium text-slate-700">Hi, {user?.name ?? 'there'}</span>
+            <Link to="/appointments" className="text-sm font-semibold text-sky-700 hover:text-sky-900">My appointments</Link>
             <button
               type="button"
               onClick={handleLogout}

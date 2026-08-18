@@ -2,9 +2,19 @@ import { createContext, useContext, useMemo, useState } from 'react'
 
 const AuthContext = createContext(null)
 
+const userIdFromToken = (token) => {
+  try {
+    const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    return Number(JSON.parse(atob(payload)).sub) || null
+  } catch {
+    return null
+  }
+}
+
 const readStoredUser = () => {
   const value = localStorage.getItem('auth_user')
-  return value ? JSON.parse(value) : null
+  const user = value ? JSON.parse(value) : null
+  return user ? { ...user, id: user.id ?? userIdFromToken(localStorage.getItem('access_token') ?? '') } : null
 }
 
 export function AuthProvider({ children }) {
@@ -14,9 +24,10 @@ export function AuthProvider({ children }) {
   const saveSession = (tokens, userData) => {
     localStorage.setItem('access_token', tokens.access_token)
     localStorage.setItem('refresh_token', tokens.refresh_token)
-    localStorage.setItem('auth_user', JSON.stringify(userData))
+    const sessionUser = { ...userData, id: userData.id ?? userIdFromToken(tokens.access_token) }
+    localStorage.setItem('auth_user', JSON.stringify(sessionUser))
     setToken(tokens.access_token)
-    setUser(userData)
+    setUser(sessionUser)
   }
 
   const logout = () => {
