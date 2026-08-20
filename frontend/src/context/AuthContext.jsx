@@ -1,24 +1,44 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 const AuthContext = createContext(null)
 
 const userIdFromToken = (token) => {
   try {
-    const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    return Number(JSON.parse(atob(payload)).sub) || null
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (typeof payload.exp !== 'number' || payload.exp * 1000 <= Date.now()) return null
+    return Number(payload.sub) || null
+  } catch {
+    return null
+  }
+}
+
+const tokenExpiryMs = (token) => {
+  try {
+    const { exp } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof exp === 'number' ? exp * 1000 : null
   } catch {
     return null
   }
 }
 
 const readStoredUser = () => {
-  const value = localStorage.getItem('auth_user')
-  const user = value ? JSON.parse(value) : null
-  return user ? { ...user, id: user.id ?? userIdFromToken(localStorage.getItem('access_token') ?? '') } : null
+  try {
+    const token = localStorage.getItem('access_token') ?? ''
+    const id = userIdFromToken(token)
+    if (!id) return null
+    const value = localStorage.getItem('auth_user')
+    const user = value ? JSON.parse(value) : null
+    return user ? { ...user, id: user.id ?? id } : { id }
+  } catch {
+    return null
+  }
 }
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem('access_token'))
+  const [token, setToken] = useState(() => {
+    const stored = localStorage.getItem('access_token')
+    return userIdFromToken(stored ?? '') ? stored : null
+  })
   const [user, setUser] = useState(readStoredUser)
 
   const saveSession = (tokens, userData) => {
@@ -30,13 +50,20 @@ export function AuthProvider({ children }) {
     setUser(sessionUser)
   }
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('auth_user')
     setToken(null)
     setUser(null)
-  }
+  }, [])
+
+  useEffect(() => {
+    const expiresAt = tokenExpiryMs(token ?? '')
+    if (!expiresAt) return undefined
+    const timeout = window.setTimeout(logout, Math.max(0, expiresAt - Date.now()))
+    return () => window.clearTimeout(timeout)
+  }, [token, logout])
 
   const value = useMemo(
     () => ({ token, user, isAuthenticated: Boolean(token), login: saveSession, logout }),
