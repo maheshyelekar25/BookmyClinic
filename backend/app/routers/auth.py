@@ -16,11 +16,12 @@ from app.schemas.user import Token, UserCreate, UserLogin
 router = APIRouter()
 
 
-def create_token_pair(user_id: int) -> Token:
+def create_token_pair(user_id: int, role: str) -> Token:
     subject = str(user_id)
     return Token(
         access_token=create_access_token(subject),
         refresh_token=create_refresh_token(subject),
+        role=role
     )
 
 
@@ -39,7 +40,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)) -> T
     db.add(user)
     await db.commit()
     await db.refresh(user)
-    return create_token_pair(user.id)
+    return create_token_pair(user.id, user.role)
 
 
 @router.post("/login", response_model=Token)
@@ -50,7 +51,7 @@ async def login(credentials: UserLogin, db: AsyncSession = Depends(get_db)) -> T
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password",
         )
-    return create_token_pair(user.id)
+    return create_token_pair(user.id, user.role)
 
 
 @router.post("/refresh", response_model=Token)

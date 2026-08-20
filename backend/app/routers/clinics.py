@@ -5,12 +5,26 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.dependencies import get_admin_user
 from app.database import get_db
 from app.models.clinic import Clinic
-from app.schemas.clinic import ClinicDetailOut, ClinicOut
+from app.models.user import User
+from app.schemas.clinic import ClinicCreate, ClinicDetailOut, ClinicOut
 from app.services.geo import haversine_distance_km
 
 router = APIRouter()
+
+@router.post("/", response_model=ClinicOut, status_code=status.HTTP_201_CREATED)
+async def create_clinic(
+    clinic_in: ClinicCreate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_admin_user),
+) -> Clinic:
+    clinic = Clinic(**clinic_in.model_dump())
+    db.add(clinic)
+    await db.commit()
+    await db.refresh(clinic)
+    return clinic
 
 
 @router.get("/nearby", response_model=list[ClinicOut])

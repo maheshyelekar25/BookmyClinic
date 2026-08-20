@@ -5,6 +5,18 @@ from pydantic import BaseModel, ConfigDict
 from app.schemas.doctor import DoctorOut
 
 
+class ClinicCreate(BaseModel):
+    name: str
+    address: str
+    city: str
+    state: str
+    pincode: str
+    lat: float
+    lng: float
+    phone: str
+    specialties: list[str]
+    rating: float = 0.0
+
 class ClinicOut(BaseModel):
     id: int
     name: str
