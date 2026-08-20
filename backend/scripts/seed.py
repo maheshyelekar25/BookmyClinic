@@ -4,9 +4,14 @@ from datetime import date, time, timedelta
 from sqlalchemy import select
 
 from app.database import AsyncSessionLocal
+from app.core.security import hash_password
 from app.models.clinic import Clinic
 from app.models.doctor import Doctor
 from app.models.appointment_slot import AppointmentSlot
+from app.models.user import User
+
+DEMO_USER_EMAIL = "demo@bookmyclinic.com"
+DEMO_USER_PASSWORD = "Demo@12345"
 
 CLINICS = [
     ("CareFirst Clinic Bandra", "Hill Road, Bandra West", "Mumbai", "Maharashtra", "400050", 19.0596, 72.8295, "022-41010001", ["General Medicine", "Dermatology"], 4.7, [("Dr. Ananya Mehta", "General Medicine", 12), ("Dr. Rohan Shah", "Dermatology", 9)]),
@@ -22,6 +27,17 @@ CLINICS = [
 
 async def seed() -> None:
     async with AsyncSessionLocal() as session:
+        demo_user = await session.scalar(select(User).where(User.email == DEMO_USER_EMAIL))
+        if not demo_user:
+            session.add(
+                User(
+                    name="Demo Patient",
+                    email=DEMO_USER_EMAIL,
+                    phone="9999999999",
+                    password_hash=hash_password(DEMO_USER_PASSWORD),
+                )
+            )
+
         if not await session.scalar(select(Clinic.id).limit(1)):
             for data in CLINICS:
                 *clinic_fields, doctors = data
@@ -58,7 +74,7 @@ async def seed() -> None:
                             )
                         )
         await session.commit()
-    print("Seeded clinics, doctors, and the next 7 days of appointment slots.")
+    print("Seeded demo user, clinics, doctors, and the next 7 days of appointment slots.")
 
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("slot_id", sa.Integer(), nullable=False),
         sa.Column("status", sa.String(length=32), nullable=False, server_default="booked"),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
         sa.ForeignKeyConstraint(["slot_id"], ["appointment_slots.id"]),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
         sa.PrimaryKeyConstraint("id"),

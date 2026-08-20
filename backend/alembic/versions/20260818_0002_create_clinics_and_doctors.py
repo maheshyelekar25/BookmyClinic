@@ -21,10 +21,10 @@ def upgrade() -> None:
         sa.Column("pincode", sa.String(length=10), nullable=False),
         sa.Column("lat", sa.Float(), nullable=False),
         sa.Column("lng", sa.Float(), nullable=False),
-        sa.Column("phone", sa.String(length=32), nullable=False),
-        sa.Column("specialties", postgresql.ARRAY(sa.String(length=100)), nullable=False),
+        sa.Column("phone", sa.String(length=20), nullable=False),
+        sa.Column("specialties", sa.JSON(), nullable=False),
         sa.Column("rating", sa.Float(), nullable=False, server_default="0"),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("CURRENT_TIMESTAMP"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index("ix_clinics_city", "clinics", ["city"])

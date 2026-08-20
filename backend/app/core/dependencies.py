@@ -23,5 +23,4 @@ async def get_current_user(
     user = await db.scalar(select(User).where(User.id == int(subject)))
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    await db.rollback()
     return user
