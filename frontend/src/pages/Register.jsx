@@ -24,7 +24,7 @@ export default function Register() {
     setIsSubmitting(true)
     try {
       const { data } = await registerRequest(form)
-      login(data, { name: form.name, email: form.email })
+      login(data, { name: form.name, email: form.email, role: data.role })
       navigate('/', { replace: true })
     } catch (requestError) {
       setError(requestError.response?.data?.detail ?? 'Unable to create your account.')

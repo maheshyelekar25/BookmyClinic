@@ -19,7 +19,7 @@ export default function Login() {
     setIsSubmitting(true)
     try {
       const { data } = await loginRequest(form)
-      login(data, { name: form.email.split('@')[0], email: form.email })
+      login(data, { name: form.email.split('@')[0], email: form.email, role: data.role })
       navigate(destination, { replace: true })
     } catch (requestError) {
       setError(requestError.response?.data?.detail ?? 'Unable to sign in. Please try again.')

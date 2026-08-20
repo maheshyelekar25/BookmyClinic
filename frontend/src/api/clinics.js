@@ -11,3 +11,5 @@ export const searchClinics = (filters) =>
   })
 
 export const getClinicById = (id) => api.get(`/clinics/${id}`)
+
+export const createClinic = (payload) => api.post('/clinics', payload)

@@ -24,6 +24,14 @@ export default function Navbar() {
         {isAuthenticated ? (
           <div className="flex items-center gap-6">
             <span className="text-sm font-medium text-soft-muted hidden sm:inline-block">Hi, {user?.name ?? 'there'}</span>
+            {user?.role === 'admin' && (
+              <Link 
+                to="/admin/add-clinic" 
+                className="text-sm font-semibold text-soft-text hover:text-soft-muted transition-colors duration-700 ease-fluid"
+              >
+                Add Clinic
+              </Link>
+            )}
             <Link 
               to="/appointments" 
               className="text-sm font-semibold text-soft-text hover:text-soft-muted transition-colors duration-700 ease-fluid"

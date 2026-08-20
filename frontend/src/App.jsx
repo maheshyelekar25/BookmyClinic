@@ -7,6 +7,7 @@ import Login from './pages/Login'
 import Booking from './pages/Booking'
 import MyAppointments from './pages/MyAppointments'
 import Register from './pages/Register'
+import AddClinic from './pages/AddClinic'
 import ProtectedRoute from './routes/ProtectedRoute'
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
       <Routes>
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<ClinicList />} />
+          <Route path="/admin/add-clinic" element={<AddClinic />} />
           <Route path="/clinics/:id" element={<ClinicDetail />} />
           <Route path="/doctors/:doctorId/slots" element={<Booking />} />
           <Route path="/appointments" element={<MyAppointments />} />
