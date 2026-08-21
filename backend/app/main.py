@@ -15,6 +15,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "https://bookmy-clinic-self.vercel.app",
     ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,3 +30,4 @@ app.include_router(doctors_router, prefix="/api/doctors", tags=["doctors"])
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
