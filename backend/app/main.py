@@ -27,7 +27,9 @@ app.include_router(clinics_router, prefix="/api/clinics", tags=["clinics"])
 app.include_router(doctors_router, prefix="/api/doctors", tags=["doctors"])
 
 
+@app.get("/")
 @app.get("/health")
+@app.get("/api/health")
 async def health_check() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "message": "BookMyClinic API is running"}
 
